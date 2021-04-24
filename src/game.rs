@@ -1,4 +1,4 @@
-use std::ffi::CString;
+use std::{ffi::CString, u8};
 use std::os::raw::c_char;
 
 use crate::internal;
@@ -198,6 +198,43 @@ pub fn get_player_controller() -> Option<PlayerControllerWrapper> {
     unsafe { PlayerControllerWrapper::try_new(GetPlayerController()) }
 }
 
+pub fn load_toast_texture(name: &str, path: &str) {
+    let c_name = CString::new(name).unwrap();
+    let c_name: *const c_char = c_name.as_ptr();
+    let c_path = CString::new(path).unwrap();
+    let c_path: *const c_char = c_path.as_ptr();
+
+    unsafe { LoadToastTexture(c_name, c_path) }
+}
+
+pub fn toast(
+    title: &str,
+    texture: &str,
+    timeout: f32,
+    toast_type: u8,
+    width: f32,
+    height: f32
+) {
+    let c_title = CString::new(title).unwrap();
+    let c_title: *const c_char = c_title.as_ptr();
+    let c_texture = CString::new(texture).unwrap();
+    let c_texture: *const c_char = c_texture.as_ptr();
+
+    unsafe { Toast(c_title, c_texture, timeout, toast_type, width, height) }
+}
+
+/*
+    fn LoadToastTexture(name: *const c_char, path: *const c_char);
+    fn Toast(
+        title: *const c_char,
+        texture: *const c_char,  // "default"
+        timeout: f32,            // 3.5
+        toast_type: u8,          // 0
+        width: f32,              // 290.0
+        height: f32              // 60
+    );
+    */
+
 
 #[allow(unused)]
 extern "C" {
@@ -226,4 +263,15 @@ extern "C" {
     fn GetCamera() -> usize;
     fn GetEngine() -> usize;
     fn GetPlayerController() -> usize;
+
+    // UI mappings
+    fn LoadToastTexture(name: *const c_char, path: *const c_char);
+    fn Toast(
+        title: *const c_char,
+        texture: *const c_char,  // "default"
+        timeout: f32,            // 3.5
+        toast_type: u8,          // 0
+        width: f32,              // 290.0
+        height: f32              // 60
+    );
 }
